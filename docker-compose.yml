@@ -3,7 +3,7 @@ services:
   app:
     build: .
     ports:
-      -"3000:3000"
+      - "3000:3000"
     environment:
       - MONGO_URI=mongodb://mongo:27017/apollonia_dental
     depends_on:
@@ -11,4 +11,8 @@ services:
   mongo:
     image: mongo:latest
     ports:
-      -27017:27017
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  # اضافه کردن Volume برای ذخیره داده‌ها
+volumes:
+  mongo-data:  # تعریف Volume

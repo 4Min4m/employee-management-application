@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apollonia Dental Employee Management</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #showEmployeesBtn {
+      background-color: #2ecc71;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    #showEmployeesBtn:hover {
+      background-color: #27ae60;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #ecf0f1;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li span {
+      color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Employee Management</h1>
+    <form id="employeeForm">
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="surname" placeholder="Surname" required>
+      <select id="department" required>
+        <option value="">Select Department</option>
+      </select>
+      <button type="submit">Add Employee</button>
+    </form>
+    <button id="showEmployeesBtn">Show Employees</button>
+    <ul id="employeeList"></ul>
+  </div>
+
+  <script>
+    async function loadDepartments() {
+      const res = await fetch('/departments');
+      const departments = await res.json();
+      const select = document.getElementById('department');
+      departments.forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept._id;
+        option.textContent = dept.name;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadEmployees() {
+      const res = await fetch('/employees');
+      const employees = await res.json();
+      const list = document.getElementById('employeeList');
+      list.innerHTML = '';
+      employees.forEach(emp => {
+        const li = document.createElement('li');
+        li.innerHTML = `${emp.name} ${emp.surname} <span>${emp.department.name}</span>`;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('employeeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const surname = document.getElementById('surname').value;
+  const department = document.getElementById('department').value;
+
+  const response = await fetch('/employees', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, surname, department })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('Error:', errorData);
+  } else {
+    console.log('Employee added successfully');
+  }
+  e.target.reset();
+});
+
+    document.getElementById('showEmployeesBtn').addEventListener('click', () => {
+      loadEmployees();
+    });
+
+    // بارگذاری اولیه دپارتمان‌ها
+    loadDepartments();
+    // لیست کارمندها فقط با دکمه نشون داده می‌شه، پس اینجا چیزی لود نمی‌کنیم
+  </script>
+</body>
+</html>
